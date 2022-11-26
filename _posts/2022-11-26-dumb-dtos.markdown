@@ -1,0 +1,62 @@
+---
+layout: post
+title:  "Keep your DTO's dumb"
+date:   2022-11-26 12:35:37 +0100
+categories: java, testing
+---
+
+Data Transfer Objects should do nothing more than their name implies. Apart from transferring data, they should do nothing. They should be completely unaware of where their data comes from, where it’s going, or why it’s going there. Sounds pretty obvious, doesn’t it? So why am I repeating this?
+
+As with all things in life, nothing is as easy as it appears. Let me walk you through a bug I dealt with a while ago, and share why it could ultimately be blamed on ‘smart’ DTO’s.
+
+I had just started working on a new project. As usual, I first made sure it can be built and tested locally. Almost immediately it became obvious that even the unit tests in this project behaved rather unpredictably. Some tests would sometimes fail and sometimes pass, even without changing anything. Surprisingly not everyone on the team was suffering from this problem. Tests would also never fail when they ran in isolation. There was only an issue when I ran the entire testsuite.
+
+But who ever runs the whole testsuite locally? Everyone just pushes their code and let the CI/CD pipeline do the rest. Surprisingly though, when running the whole testsuite on Jenkins, it behaved as expected. So the problem remained largely unnoticed.
+
+All good and well, but what does this have to do with DTO’s?
+I’ll get to that, don’t worry. It will quickly make sense once we take a closer look at what one of the unstable tests looked like:
+
+```
+@Test
+void createsNewObject() throws Exception {
+  final MockHttpServletRequestBuilder request = 
+    RestDocumentationRequestBuilders.put("/endpoint")
+      .content(asJsonString(MY_DTO_OBJECT))
+      .contentType(APPLICATION_JSON);
+  when(processor.process(MY_DTO_OBJECT)).thenReturn(NEW_OBJECT_RESPONSE);
+
+  final ResultActions result = mockMvc.perform(request);
+
+  result.andExpect(status().is(Matchers.in(new Integer[]{200, 201})));
+}
+```
+
+This test failed with a NullPointerException, somewhere in the controller we’re testing. More specifically, processor.process() returned null. Which is weird, since the argument is in fact MY_DTO_OBJECT, and we explicitly state that in this case, it should return NEW_OBJECT_RESPONSE.
+
+The attentive reader probably already figured out that this cannot possibly be correct. First of all, because the test wouldn’t fail if it was, and secondly, because we never directly pass MY_DTO_OBJECT to the controller. It’s passed as a JSON object and rebuilt by Spring. Therefore, the argument cannot be equal.
+
+But that shouldn’t matter. Mockito argument matching calls Object.equals(Object other); And we do in fact Override the equals method on our DTO. Let’s take a closer look at what kind of DTO we’re dealing with. It’s heavily simplified though, just to illustrate the point.
+
+```
+public class MyDto {
+    private final URL theURL;
+
+    public URL getTheURL() {
+        return this.theURL;
+    }
+
+    public boolean equals(final Object o) {
+        if (o == this) return true;
+        if (!(o instanceof MyDto)) return false;
+        return Objects.equals(this.getTheURL(), ((MyDto)o).getTheURL());
+    }
+
+    public int hashCode() { /* skipped */ }
+}
+```
+
+A URL looks pretty innocent, but a quick Google search shows that URL.equals() is completely broken. In fact, this has been known since 2006. Mystery solved! Our argument matching did not work since the URLs in our DTO need to be equal, and that can behave unpredictably because it depends on your DNS settings.
+
+Most discussions on this problem will tell you to use URI instead, but I’d go a step further and say that for DTO’s, even URI is overkill. The Data Transfer Object should not know how to use this data, it should only transfer the data itself. Let the end-user deal with creating an URI from a given String, and handle all the exceptions that go with it.
+
+For DTO’s, POJO‘s suffice.
