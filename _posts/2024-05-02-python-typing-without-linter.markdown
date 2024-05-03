@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Always lint python typing"
-date:   2024-05-03 20:19:37 +0100
+date:   2024-05-02 20:19:37 +0100
 categories: python, testing
 ---
 
