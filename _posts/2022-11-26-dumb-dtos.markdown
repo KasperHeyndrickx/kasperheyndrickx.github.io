@@ -2,7 +2,7 @@
 layout: post
 title:  "Keep your DTO's dumb"
 date:   2022-11-26 12:35:37 +0100
-categories: java, testing
+categories: java testing
 ---
 
 Data Transfer Objects should do nothing more than their name implies. Apart from transferring data, they should do nothing. They should be completely unaware of where their data comes from, where it’s going, or why it’s going there. Sounds pretty obvious, doesn’t it? So why am I repeating this?

@@ -2,7 +2,7 @@
 layout: post
 title:  "Don't overwrite docker tags"
 date:   2022-11-26 14:51:22 +0100
-categories: docker, devops
+categories: docker devops
 ---
 
 # The ambiguity of docker tags
