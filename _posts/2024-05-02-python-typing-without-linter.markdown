@@ -7,7 +7,7 @@ categories: python, testing
 
 ## Dynamically and statically typed languages
 
-Unlike statically typed languages like Java, C++ and others, Python is a dynamically typed language. This means that the type of the variable isn't fixed. This means that the following example is valid Python code.
+Unlike statically typed languages like Java, C++ and others, Python is a dynamically typed language. This means that the type of the variable isn't fixed. To illustrate this, let's look at some valid Python code in the following example.
 
 ```
 def addOne(number) :
@@ -55,9 +55,9 @@ def addOne(number : str) -> list:
 ```
 All these type hints are nothing but documentation, that's kept up to date by nothing more than good intentions. Anyone who has worked on large codebases know that documentation quickly becomes outdated, unless there's a strong culture of doing code reviews, or some kind of an automated check is in place, to match the documentation to the actual code.
 
-## Mypy
+## Linting
 
-The only way to get true benefit from type hints, and to keep them up to date, is to introduce a linter that checks for them. The first python linter that does type checking is [mypy](https://mypy-lang.org/). Let's take a look what it outputs for our previous example:
+The only way to get true benefit from type hints, and to keep them up to date, is to introduce a linter that checks for them. A linter is a tool that performs static analysis on your code. In other words, it checks for errors without actually running the code. The first python linter that does type checking is [mypy](https://mypy-lang.org/). Let's take a look what it outputs for our previous example:
 
 ```
 mypy example.py
