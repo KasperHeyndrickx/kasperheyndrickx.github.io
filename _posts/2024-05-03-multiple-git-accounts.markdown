@@ -34,7 +34,7 @@ To set up the actual username and email, I need to create two new files: `~/.git
         email = name@company.com
 ```
 
-To test if this works, `cd` to any repository and run `git config user.email`. It should return your private email address on private repositories, and your work email for work repositories. 
+To test if this works, `cd` to any repository and run `git config user.email`. It should return your private email address on private repositories, and your work email for work repositories.
 
 ## SSH keys
 
@@ -77,8 +77,8 @@ gpg --list-secret-keys --keyid-format=long
 
 # export the public key
 gpg --armor --export 546E539071567BD2
-
 ```
+
 From this output, copy the part beginning with `-----BEGIN PGP PUBLIC KEY BLOCK-----` and ending with `-----END PGP PUBLIC KEY BLOCK-----`. This key should then be added under 'GPG keys' on github.
 
 If you want to add GPG signing to only one account and not for the ohter, then this can also be done by modifying the matching `~/.gitconfig` files. For example:
@@ -88,4 +88,4 @@ If you want to add GPG signing to only one account and not for the ohter, then t
         gpgsign = true / false
 ```
 
-That's it! Now git is fully set up to work with multiple accounts. 
+That's it! Now git is fully set up to work with multiple accounts.
